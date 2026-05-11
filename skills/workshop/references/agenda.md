@@ -33,7 +33,7 @@ I created a plugin to make it easier to install the skills for email-triage, tok
 
 AI assistants typically have a file with reference information about you and the bot.
 
-* Write a [CLAUDE.md](http://CLAUDE.md) file. Add this information: This project accumulates skills for a personal assistant. The assistant can do communication, prioritization, and . Add new skills with project scope. My name is \<name\>. My LinkedIn account is \<URL\>. My email address is \<email\>  
+* Write a [CLAUDE.md](http://CLAUDE.md) file. Add this information: This project accumulates skills for a personal assistant. The assistant can do communication, prioritization, and some crypto opersations. Add new skills and plugins with project scope. My name is \<name\>. My LinkedIn account is \<URL\>. My email address is \<email\>  
 * Show me the [Claude.md](http://Claude.md) file as an HTML artifact
 
 ## Assist with email
@@ -77,7 +77,7 @@ LetsFG MCP server is defined in the workshop plugin.
 
 ## View crypto token data
 
-The plugin includes a [query-token-info](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/query-token-info/SKILL.md) skill that gets free data from Binance.
+The plugin includes a [query-token-info](https://github.com/binance/binance-skills-hub/blob/main/skills/binance-web3/query-token-info/SKILL.md) skill that gets free data from Binance. This skill does not install an MCP or CLI tool. It defines HTTP calls inside the text of the skill file. Skills can also contain text scripts that implement tools.
 
 * Get 30 days of kline data for ETH  
 * Graph the ETH price for the last 30 days in the artifact window
@@ -105,7 +105,7 @@ This will create a wallet that uses the “Open Wallet Standard”. I think this
 
 ## Create a new skill
 
-The workshop plugin includes the skill-creator skill from Anthropic. 
+The workshop plugin includes the skill-creator skill from Anthropic. It writes a skill in the correct format, and then suggests ways to evaluate and improve it.
 
 * *Ask Claude to create a new skill*
 
