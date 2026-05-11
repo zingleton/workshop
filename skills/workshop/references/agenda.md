@@ -27,7 +27,7 @@ Claude Code can add objects like “skills” in a project directory.
 
 I created a plugin to make it easier to install the skills for email-triage, token-info, and skill-creator.
 
-* install the workshop plugin from zingleton/workshop at project scope
+* install the workshop plugin from zingleton/workshop with project scope
 
 ## Make a [CLAUDE.md](http://CLAUDE.md) reference
 
