@@ -22,6 +22,7 @@ Claude Code can add objects like “skills” in a project directory.
 * *Enable “bypass permissions” mode in Claude settings*  
 * Set the “workshop” directory as the default directory  
 * *Optional: Open a shell window (Terminal on Mac, Powershell on Windows) and “cd workshop”*
+* Initialize this folder as a Claude Code project
 
 ## Add the workshop plugin
 
