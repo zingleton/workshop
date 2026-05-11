@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "workshop-marketplace",
+  "owner": {
+    "name": "Andy Singleton"
+  },
+  "plugins": [
+    {
+      "name": "workshop",
+      "source": "./",
+      "description": "Workshop plugin — bundles skills and commands for configuring a personal AI assistant."
+    }
+  ]
+}
