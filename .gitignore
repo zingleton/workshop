@@ -11,6 +11,9 @@
 *.log
 *.tmp
 
+# Skill-creator eval workspaces
+skills/*-workspace/
+
 # Environment / secrets
 .env
 .env.local
