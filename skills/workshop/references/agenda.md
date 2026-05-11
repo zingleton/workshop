@@ -29,12 +29,14 @@ Claude Code can add objects like “skills” in a project directory.
 I created a plugin to make it easier to install the skills for email-triage, token-info, and skill-creator.
 
 * install the workshop plugin from zingleton/workshop with project scope
+* *Start a new session*
+* What skills are in this project?
 
 ## Make a [CLAUDE.md](http://CLAUDE.md) reference
 
 AI assistants typically have a file with reference information about you and the bot.
 
-* Write a [CLAUDE.md](http://CLAUDE.md) file. Add this information: This project accumulates skills for a personal assistant. The assistant can do communication, prioritization, and some crypto opersations. Add new skills and plugins with project scope. My name is \<name\>. My LinkedIn account is \<URL\>. My email address is \<email\>  
+* Write a [CLAUDE.md](http://CLAUDE.md) file. Add this information: This project accumulates skills for a personal assistant. The assistant can do communication, prioritization, and some crypto operations. Add new skills and plugins with project scope. My name is \<name\>. My LinkedIn account is \<URL\>. My email address is \<email\>  
 * Show me the [Claude.md](http://Claude.md) file as an HTML artifact
 
 ## Assist with email
