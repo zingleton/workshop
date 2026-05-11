@@ -81,6 +81,7 @@ The plugin includes a [query-token-info](https://github.com/binance/binance-skil
 
 * Get 30 days of kline data for ETH  
 * Graph the ETH price for the last 30 days in the artifact window
+* *What other data can we get from query-token-info? Can we display it graphically?*
 
 ## Add some crypto skills from Moonpay
 
