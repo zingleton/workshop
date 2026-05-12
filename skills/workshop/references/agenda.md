@@ -2,7 +2,7 @@
 
 *Andy Singleton, [andy@singleton.ai](mailto:andy@singleton.ai), @zingle on telegram*
 
-You can use many different apps to run an AI assistant. This workshop uses the popular Claude Code as an AI app, and Whatsapp for group chat.
+You can use many different apps to run an AI assistant. This workshop uses the popular Claude Code as an AI app, and Whatsapp for group chat..
 
 See the workshop agenda at [Singleton.ai/w1](http://Singleton.ai/w1)
 
