@@ -1,0 +1,22 @@
+{
+  "name": "x402-pay",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "OWS-backed x402 payment client for the headless_vibe workshop.",
+  "scripts": {
+    "pay": "tsx pay.ts"
+  },
+  "dependencies": {
+    "@open-wallet-standard/adapters": "latest",
+    "@open-wallet-standard/core": "latest",
+    "dotenv": "^16.4.5",
+    "viem": "^2.21.0",
+    "x402-fetch": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
