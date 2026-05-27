@@ -1,6 +1,6 @@
 ---
 name: x402-pay
-description: Install an Open Wallet Standard (OWS) wallet, create a local wallet and record its addresses in CLAUDE.md, and make paid (x402) API requests signed by that wallet in USDC. Triggers - "install the OWS wallet", "set up x402", "create a wallet", "make an x402 payment", "order coffee", "buy premium beans", "pay for <url>".
+description: Install an Open Wallet Standard (OWS) wallet, create a local wallet and record its addresses in CLAUDE.md, and make paid (x402) API requests signed by that wallet in USDC. Triggers - "install the OWS wallet", "set up x402", "create a wallet", "make an x402 payment", "order coffee", "buy premium beans", "pay for URL".
 tags: [payments, api, wallet, setup]
 ---
 
