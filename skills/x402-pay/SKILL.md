@@ -20,64 +20,43 @@ the repo, `.env`, or exposed to the script.
 
 ## Action 1: Install OWS
 
-OWS ships a Rust core with native bindings — **no Rust toolchain required** (the
-npm packages bundle prebuilt binaries for macOS arm64/x64 and Linux x64/arm64).
-Node.js ≥ 18 must already be installed.
+**The only native component is the global `ows` CLI.** `pay.ts` itself is pure
+JavaScript using Node built-ins (`fetch`, `crypto`, `child_process`) — it has no
+native node bindings, so it runs on any platform with Node ≥ 18. All cryptography
+(EIP-712 signing) happens inside the `ows` CLI.
 
-**a) Install the global `ows` CLI** (provides `ows wallet`, `ows fund`, etc.):
+**a) Install the global `ows` CLI** — installs the prebuilt binary for the host
+platform (macOS arm64/x64, Linux x64/arm64):
 
 ```bash
 npm install -g @open-wallet-standard/core
 ows --version
 ```
 
-> Alternative full installer (CLI + Node + Python bindings):
-> `curl -fsSL https://docs.openwallet.sh/install.sh | bash`
+> Alternative full installer: `curl -fsSL https://docs.openwallet.sh/install.sh | bash`
 
-**b) Install the skill's script dependencies** (the SDK, the viem adapter, and the
-x402 client used by `pay.ts`):
+**b) Install the script's dependencies** (pure JS — no native code, no compiler):
 
 ```bash
 cd .claude/skills/x402-pay/scripts
 npm install
 ```
 
-This installs, per `scripts/package.json`:
-
-| Package | Role |
-|---------|------|
-| `@open-wallet-standard/core` | OWS vault + signing (native binding) |
-| `@open-wallet-standard/adapters` | `owsToViemAccount` — wraps the vault as a viem signer |
-| `viem` | EVM account interface used by the x402 client |
-| `x402-fetch` | x402 **V1** payment client |
-| `dotenv` | loads `.env` |
-| `tsx`, `typescript`, `@types/node` | run/type the script |
-
-The global CLI (a) is optional if you create wallets via the SDK (see Action 2),
-but it's the easiest way to run `ows wallet list` / `ows fund balance`.
+Per `scripts/package.json` there are **no runtime dependencies** at all;
+`tsx`/`typescript` are dev tooling to run the `.ts` file. There is no `viem`,
+`x402-fetch`, `keccak`, `dotenv`, or any native node addon — the script uses only
+Node built-ins, and the OWS CLI does the signing.
 
 ---
 
 ## Action 2: Create a wallet and record addresses
 
-**1. Create the wallet.** Either the CLI or the SDK works; both write to the same
-vault (`~/.ows/wallets/`) and derive addresses for every supported chain.
+**1. Create the wallet** with the `ows` CLI. It writes to the vault
+(`~/.ows/wallets/`) and derives addresses for every supported chain.
 
 ```bash
-# CLI (preferred)
 ows wallet create --name headless-vibe
-ows wallet list
-```
-
-```bash
-# SDK fallback (no global CLI). Run from .claude/skills/x402-pay/scripts:
-node -e '
-const ows = require("@open-wallet-standard/core");
-const name = "headless-vibe";
-let w = ows.listWallets().find(x => x.name === name) || (ows.createWallet(name), ows.getWallet(name));
-const evm = w.accounts.find(a => a.chainId.startsWith("eip155:"));
-console.log("EVM address:", evm.address);
-'
+ows wallet list                          # shows each chain: "eip155:84532 (Base Sepolia) -> 0x.."
 ```
 
 **2. Record the wallet in `CLAUDE.md`.** Add (or update) a `## Crypto wallet`
@@ -98,14 +77,13 @@ Example block to write into `CLAUDE.md`:
 - USDC on Base Sepolia: 0x036CbD53842c5426634e7929541eC2318f3dCF7e
 ```
 
-**3. Point the skill at the wallet.** Create `.claude/skills/x402-pay/scripts/.env`
-(covered by the repo's `.env*` gitignore — no secret is stored, just the name):
+**3. No config file needed.** `pay.ts` reads the wallet **name and EVM address
+straight from the `## Crypto wallet` section of `CLAUDE.md`** (what you wrote in
+step 2). There is no `.env`. Resolution order:
 
-```
-OWS_WALLET=headless-vibe
-EVM_RPC_URL=https://sepolia.base.org
-# X402_CHAIN=eip155:84532   # optional; Base Sepolia is the default
-```
+1. `--wallet <name>` flag (address then derived from `ows wallet list`), else
+2. CLAUDE.md `## Crypto wallet` section (name + address), else
+3. `OWS_WALLET` environment variable.
 
 **4. Fund it.** Send **Base Sepolia USDC** to the EVM address from the Circle
 faucet (https://faucet.circle.com → Base Sepolia). **No native ETH needed** — the
@@ -121,8 +99,8 @@ Call an x402-protected endpoint; the script handles the `402 → sign → retry`
 and pays from the OWS wallet.
 
 The script defaults to **POST** and always sends `Accept: application/json` (many
-x402 servers only emit the `402` challenge for JSON POSTs). It speaks x402 **V1**
-via `x402-fetch`.
+x402 servers only emit the `402` challenge for JSON POSTs). It implements the
+x402 **V1** "exact" (EIP-3009) flow directly in pure JS.
 
 ```bash
 cd .claude/skills/x402-pay/scripts
@@ -149,18 +127,21 @@ If a request needs a name and none is given, default to **Andy** (see CLAUDE.md)
 ### How the payment works
 
 1. The script POSTs the request; the server replies `402 Payment Required` with
-   the accepted networks/amounts.
-2. The OWS viem adapter (`owsToViemAccount`) produces a viem account that signs
-   the **EIP-3009 `transferWithAuthorization`** payload inside the vault.
-3. The request is retried with the signed `X-PAYMENT` header.
+   the accepted networks/amounts (`accepts[]`).
+2. `pay.ts` builds the **EIP-3009 `TransferWithAuthorization`** typed data
+   (from `accepts[0]`: `payTo`, `asset`, amount, `extra.name`/`version`, a random
+   nonce, validity window) and signs it via the CLI:
+   `ows sign message --typed-data <json>` — the key never leaves the vault.
+3. The signed authorization is base64-encoded into the `X-PAYMENT` header and the
+   request is retried.
 4. The server's facilitator settles the transfer on-chain and **pays the gas** —
    the wallet only needs USDC, not ETH.
 
-> Implementation note: the OWS viem adapter leaves viem's `sign` undefined and
-> omits the `EIP712Domain` type (viem derives it internally). `pay.ts` shims both
-> — it supplies a `sign` backed by OWS `signHash` and reconstructs `EIP712Domain`
-> from the domain fields — so the OWS core accepts the strict
-> `eth_signTypedData_v4` payload x402 produces.
+> Implementation notes:
+> - The OWS core wants strict `eth_signTypedData_v4` JSON, so `pay.ts` includes
+>   the `EIP712Domain` type definition explicitly.
+> - Addresses are passed through as-is (OWS already returns EIP-55 checksummed,
+>   and EIP-712 hashing is case-insensitive), so no keccak/checksum code is needed.
 
 ### Notes
 
